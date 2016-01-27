@@ -191,8 +191,13 @@ public class ApacheHttpServerKonnector extends Konnector {
 		return CommandResult.Success;
 	}
 
-	static class RequestListenerThread extends Thread {
+	Konnector _this() {
+		return this;
+	}
 
+	class RequestListenerThread extends Thread {
+
+		// private final Konnector m_this;
 		private final HttpConnectionFactory<DefaultBHttpServerConnection> connFactory;
 		private final ServerSocket serversocket;
 		private final HttpService httpService;
@@ -201,6 +206,7 @@ public class ApacheHttpServerKonnector extends Konnector {
 		public RequestListenerThread(final int port,
 				final HttpService httpService, final ServerSocket serversocket,
 				final Object latch) throws IOException {
+			// this.m_this = konnector;
 			this.connFactory = DefaultBHttpServerConnectionFactory.INSTANCE;
 			this.serversocket = serversocket;
 			this.httpService = httpService;
@@ -209,14 +215,20 @@ public class ApacheHttpServerKonnector extends Konnector {
 
 		@Override
 		public void run() {
-			System.out.println("Listening on port "
-					+ this.serversocket.getLocalPort());
+			if (AdminLogger.isInfoEnabled())
+				AdminLogger.info(ApacheHttpServerKonnector.this
+						.buildAdminLog("Listening on port<"
+								+ this.serversocket.getLocalPort() + ">"));
 			while (!Thread.interrupted()) {
 				try {
 					// Set up HTTP connection
 					Socket socket = this.serversocket.accept();
-					// System.out.println("Incoming connection from "
-					// + socket.getInetAddress());
+
+					if (AdminLogger.isDebugEnabled())
+						AdminLogger.debug(ApacheHttpServerKonnector.this
+								.buildAdminLog("Incoming connection from<"
+										+ socket.getInetAddress() + ">"));
+
 					HttpServerConnection conn = this.connFactory
 							.createConnection(socket);
 					// Use a network thread to service the connection
@@ -227,14 +239,18 @@ public class ApacheHttpServerKonnector extends Konnector {
 				} catch (InterruptedIOException ex) {
 					break;
 				} catch (IOException e) {
-					System.err
-							.println("I/O error initialising connection thread: "
-									+ e.getMessage());
+					AdminLogger
+							.error(ApacheHttpServerKonnector.this
+									.buildAdminLog("I/O error initialising connection thread: "
+											+ e.getMessage()));
 					break;
 				}
 			}
-			System.out.println("Stop listening on port "
-					+ this.serversocket.getLocalPort());
+
+			if (AdminLogger.isInfoEnabled())
+				AdminLogger.info(ApacheHttpServerKonnector.this
+						.buildAdminLog("Stop listening on port<"
+								+ this.serversocket.getLocalPort() + ">"));
 
 			try {
 				serversocket.close();
@@ -248,7 +264,7 @@ public class ApacheHttpServerKonnector extends Konnector {
 		}
 	}
 
-	static class WorkerThread implements Runnable {
+	class WorkerThread implements Runnable {
 
 		private final HttpService httpservice;
 		private final HttpServerConnection conn;
@@ -262,19 +278,21 @@ public class ApacheHttpServerKonnector extends Konnector {
 
 		@Override
 		public void run() {
-			// System.out.println("New connection thread");
 			HttpContext context = new BasicHttpContext(null);
 			try {
 				while (!Thread.interrupted() && this.conn.isOpen()) {
 					this.httpservice.handleRequest(this.conn, context);
 				}
-			} catch (ConnectionClosedException ex) {
-				System.err.println("Client closed connection");
-			} catch (IOException ex) {
-				System.err.println("I/O error: " + ex.getMessage());
-			} catch (HttpException ex) {
-				System.err.println("Unrecoverable HTTP protocol violation: "
-						+ ex.getMessage());
+			} catch (ConnectionClosedException e) {
+				AdminLogger.error(ApacheHttpServerKonnector.this
+						.buildAdminLog("ConnectionClosedException:"
+								+ e.getMessage()));
+			} catch (IOException e) {
+				AdminLogger.error(ApacheHttpServerKonnector.this
+						.buildAdminLog("IOException:" + e.getMessage()));
+			} catch (HttpException e) {
+				AdminLogger.error(ApacheHttpServerKonnector.this
+						.buildAdminLog("HttpException:" + e.getMessage()));
 			} finally {
 				try {
 					this.conn.shutdown();
@@ -456,7 +474,7 @@ public class ApacheHttpServerKonnector extends Konnector {
 			e.printStackTrace();
 			return CommandResult.Fail;
 		}
-		
+
 		this.setStopped();
 
 		return CommandResult.Success;
