@@ -136,14 +136,15 @@ public class ApacheNHttpServerKonnector extends Konnector {
 			if (m_config.keyStore != null) {
 				KeyManagerFactory kmfactory;
 				try {
-					KeyStore keyStore = KeyStore
-							.getInstance(m_config.keyStore.type);
-					keyStore.load(new FileInputStream(m_config.keyStore.path),
-							m_config.keyStore.password.toCharArray());
+					KeyStore keyStore = KeyStore.getInstance(m_config.keyStore
+							.getType());
+					keyStore.load(
+							new FileInputStream(m_config.keyStore.getPath()),
+							m_config.keyStore.getPassword().toCharArray());
 					kmfactory = KeyManagerFactory.getInstance(KeyManagerFactory
 							.getDefaultAlgorithm());
-					kmfactory.init(keyStore,
-							m_config.keyStore.password.toCharArray());
+					kmfactory.init(keyStore, m_config.keyStore.getPassword()
+							.toCharArray());
 				} catch (KeyStoreException | NoSuchAlgorithmException
 						| CertificateException | IOException
 						| UnrecoverableKeyException e) {
@@ -311,7 +312,7 @@ public class ApacheNHttpServerKonnector extends Konnector {
 			if (h_auth == null) {
 				response.setStatusCode(HttpStatus.SC_UNAUTHORIZED);
 				response.addHeader(AUTH.WWW_AUTH, "Basic realm=\""
-						+ m_config.authentication.realm + "\"");
+						+ m_config.authentication.getRealm() + "\"");
 				return false;
 			}
 
@@ -329,8 +330,8 @@ public class ApacheNHttpServerKonnector extends Konnector {
 			String username = credentials.split(":")[0];
 			String password = credentials.split(":")[1];
 
-			if (!m_config.authentication.username.equals(username)
-					|| !m_config.authentication.password.equals(password)) {
+			if (!m_config.authentication.getUsername().equals(username)
+					|| !m_config.authentication.getPassword().equals(password)) {
 
 				response.setStatusCode(HttpStatus.SC_FORBIDDEN);
 				try {
@@ -341,11 +342,11 @@ public class ApacheNHttpServerKonnector extends Konnector {
 				return false;
 			}
 
-			if (m_config.authentication.realm != null
-					&& !m_config.authentication.realm.isEmpty()) {
+			if (m_config.authentication.getRealm() != null
+					&& !m_config.authentication.getRealm().isEmpty()) {
 
 				String realm[] = h_realm.toString().split(" ");
-				if (!m_config.authentication.realm.equals(realm[1])) {
+				if (!m_config.authentication.getRealm().equals(realm[1])) {
 					response.setStatusCode(HttpStatus.SC_FORBIDDEN);
 					try {
 						response.setEntity(new StringEntity(

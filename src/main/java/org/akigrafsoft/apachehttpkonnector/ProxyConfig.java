@@ -1,38 +1,61 @@
 package org.akigrafsoft.apachehttpkonnector;
 
+import java.io.Serializable;
+
 /**
+ * 
+ * <p>
+ * <b>This is a Java bean and all extension classes MUST be Java beans.</b>
+ * </p>
  * 
  * @author kmoyse
  * 
  */
-public class ProxyConfig {
-	public final String host;
-	public final int port;
-	public final String scheme;
-
-	public AuthenticationConfig authentication = null;
-
+public class ProxyConfig implements Serializable {
 	/**
 	 * 
-	 * @param proxyHost
-	 * @param proxyPort
-	 * @param proxyScheme
 	 */
-	public ProxyConfig(String proxyHost, int proxyPort, String proxyScheme) {
-		super();
-		this.host = proxyHost;
-		this.port = proxyPort;
-		this.scheme = proxyScheme;
+	private static final long serialVersionUID = 7709241563729115250L;
+
+	private String host;
+	private int port;
+	private String scheme;
+
+	private AuthenticationConfig authentication = null;
+
+	// ------------------------------------------------------------------------
+	// Java Bean
+
+	public String getHost() {
+		return host;
 	}
 
-	/**
-	 * 
-	 * @param authentication
-	 * @return
-	 */
-	public ProxyConfig setAuthentication(AuthenticationConfig authentication) {
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public String getScheme() {
+		return scheme;
+	}
+
+	public void setScheme(String scheme) {
+		this.scheme = scheme;
+	}
+
+	public AuthenticationConfig getAuthentication() {
+		return authentication;
+	}
+
+	public void setAuthentication(AuthenticationConfig authentication) {
 		this.authentication = authentication;
-		return this;
 	}
 
 }

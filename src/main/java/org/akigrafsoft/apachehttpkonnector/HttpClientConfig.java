@@ -6,23 +6,79 @@ import java.net.URL;
 import com.akigrafsoft.knetthreads.ExceptionAuditFailed;
 import com.akigrafsoft.knetthreads.konnector.SessionBasedClientKonnectorConfiguration;
 
-public class HttpClientConfig extends
-		SessionBasedClientKonnectorConfiguration {
+/**
+ * Configuration class for {@link ApacheHttpClientKonnector}
+ * <p>
+ * <b>This is a Java bean and all extension classes MUST be Java beans.</b>
+ * </p>
+ * 
+ * @author kmoyse
+ * 
+ */
+public class HttpClientConfig extends SessionBasedClientKonnectorConfiguration {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7572328556052053031L;
 
 	/**
 	 * Fully qualified URL
 	 * 
 	 */
-	public String url = "http://localhost:8080";
+	private String url = "http://localhost:8080";
 
 	// public HashMap<String, String> headers = new HashMap<String, String>();
 
-	public AuthenticationConfig authentication = null;
+	private AuthenticationConfig authentication = null;
 
-	public ProxyConfig proxy = null;
+	private ProxyConfig proxy = null;
 
-	public KeyStoreConfig keyStore = null;
-	public KeyStoreConfig trustStore = null;
+	private KeyStoreConfig keyStore = null;
+	private KeyStoreConfig trustStore = null;
+
+	// ------------------------------------------------------------------------
+	// Java bean
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public AuthenticationConfig getAuthentication() {
+		return authentication;
+	}
+
+	public void setAuthentication(AuthenticationConfig authentication) {
+		this.authentication = authentication;
+	}
+
+	public ProxyConfig getProxy() {
+		return proxy;
+	}
+
+	public void setProxy(ProxyConfig proxy) {
+		this.proxy = proxy;
+	}
+
+	public KeyStoreConfig getKeyStore() {
+		return keyStore;
+	}
+
+	public void setKeyStore(KeyStoreConfig keyStore) {
+		this.keyStore = keyStore;
+	}
+
+	public KeyStoreConfig getTrustStore() {
+		return trustStore;
+	}
+
+	public void setTrustStore(KeyStoreConfig trustStore) {
+		this.trustStore = trustStore;
+	}
 
 	// ------------------------------------------------------------------------
 	// Fluent API
@@ -55,9 +111,12 @@ public class HttpClientConfig extends
 	 * @param password
 	 * @return
 	 */
-	public HttpClientConfig keyStore(String type, String path,
-			String password) {
-		this.keyStore = new KeyStoreConfig(type, path, password);
+	public HttpClientConfig keyStore(String type, String path, String password) {
+		// this.keyStore = new KeyStoreConfig(type, path, password);
+		this.keyStore = new KeyStoreConfig();
+		this.keyStore.setType(type);
+		this.keyStore.setPath(path);
+		this.keyStore.setPassword(password);
 		return this;
 	}
 
@@ -68,9 +127,14 @@ public class HttpClientConfig extends
 	 * @param password
 	 * @return
 	 */
-	public HttpClientConfig trustStore(String type, String path,
-			String password) {
-		this.trustStore = new KeyStoreConfig(type, path, password);
+	public HttpClientConfig trustStore(String type, String path, String password) {
+		// this.trustStore = new KeyStoreConfig(type, path, password);
+
+		this.trustStore = new KeyStoreConfig();
+		this.trustStore.setType(type);
+		this.trustStore.setPath(path);
+		this.trustStore.setPassword(password);
+
 		return this;
 	}
 
@@ -98,25 +162,25 @@ public class HttpClientConfig extends
 		}
 
 		if (authentication != null) {
-			if ((authentication.username == null)
-					|| authentication.username.isEmpty()) {
+			if ((authentication.getUsername() == null)
+					|| authentication.getUsername().isEmpty()) {
 				throw new ExceptionAuditFailed(
 						"authentication.username must be provided and non empty");
 			}
-			if ((authentication.password == null)
-					|| authentication.password.isEmpty()) {
+			if ((authentication.getPassword() == null)
+					|| authentication.getPassword().isEmpty()) {
 				throw new ExceptionAuditFailed(
 						"authentication.password must be provided and non empty");
 			}
 		}
 
 		if (proxy != null) {
-			if (proxy.port <= 0) {
+			if (proxy.getPort() <= 0) {
 				throw new ExceptionAuditFailed("proxyPort must be > 0");
 			}
-			if ((proxy.scheme == null)
-					|| proxy.scheme.equals("")
-					|| (!proxy.scheme.equals("http") && !proxy.scheme
+			if ((proxy.getScheme() == null)
+					|| proxy.getScheme().equals("")
+					|| (!proxy.getScheme().equals("http") && !proxy.getScheme()
 							.equals("https"))) {
 				throw new ExceptionAuditFailed(
 						"proxyScheme must be http or https");
@@ -124,30 +188,34 @@ public class HttpClientConfig extends
 		}
 
 		if (keyStore != null) {
-			if ((keyStore.type == null) || keyStore.type.isEmpty()) {
+			if ((keyStore.getType() == null) || keyStore.getType().isEmpty()) {
 				throw new ExceptionAuditFailed(
 						"keyStore.type must be provided and non empty");
 			}
-			if ((keyStore.path == null) || keyStore.path.isEmpty()) {
+			if ((keyStore.getPath() == null) || keyStore.getPath().isEmpty()) {
 				throw new ExceptionAuditFailed(
 						"keyStore.path must be provided and non empty");
 			}
-			if ((keyStore.password == null) || keyStore.password.isEmpty()) {
+			if ((keyStore.getPassword() == null)
+					|| keyStore.getPassword().isEmpty()) {
 				throw new ExceptionAuditFailed(
 						"keyStore.password must be provided and non empty");
 			}
 		}
 
 		if (trustStore != null) {
-			if ((trustStore.type == null) || trustStore.type.isEmpty()) {
+			if ((trustStore.getType() == null)
+					|| trustStore.getType().isEmpty()) {
 				throw new ExceptionAuditFailed(
 						"trustStore.type must be provided and non empty");
 			}
-			if ((trustStore.path == null) || trustStore.path.isEmpty()) {
+			if ((trustStore.getPath() == null)
+					|| trustStore.getPath().isEmpty()) {
 				throw new ExceptionAuditFailed(
 						"trustStore.path must be provided and non empty");
 			}
-			if ((trustStore.password == null) || trustStore.password.isEmpty()) {
+			if ((trustStore.getPassword() == null)
+					|| trustStore.getPassword().isEmpty()) {
 				throw new ExceptionAuditFailed(
 						"trustStore.password must be provided and non empty");
 			}

@@ -101,7 +101,7 @@ public class ApacheHttpClientKonnector extends SessionBasedClientKonnector {
 	protected CommandResult preSessionCreation() {
 		URL l_url;
 		try {
-			l_url = new URL(m_config.url);
+			l_url = new URL(m_config.getUrl());
 		} catch (MalformedURLException e) {
 			// Should not happen if audit does it !
 			e.printStackTrace();
@@ -116,13 +116,14 @@ public class ApacheHttpClientKonnector extends SessionBasedClientKonnector {
 		if (l_url.getProtocol().equalsIgnoreCase("https")) {
 			SSLContextBuilder sslcb = SSLContexts.custom();
 			Registry<ConnectionSocketFactory> socketFactoryRegistry = null;
-			if (m_config.trustStore != null) {
+			if (m_config.getTrustStore() != null) {
 				KeyStore truststore;
 				try {
-					truststore = KeyStore.getInstance(m_config.trustStore.type);
-					truststore.load(new FileInputStream(
-							m_config.trustStore.path),
-							m_config.trustStore.password.toCharArray());
+					truststore = KeyStore.getInstance(m_config.getTrustStore()
+							.getType());
+					truststore.load(new FileInputStream(m_config
+							.getTrustStore().getPath()), m_config
+							.getTrustStore().getPassword().toCharArray());
 					TrustStrategy trustStrategy = new TrustSelfSignedStrategy();
 					sslcb.loadTrustMaterial(truststore, trustStrategy);
 				} catch (KeyStoreException e) {
@@ -137,14 +138,16 @@ public class ApacheHttpClientKonnector extends SessionBasedClientKonnector {
 					e.printStackTrace();
 				}
 			}
-			if (m_config.keyStore != null) {
+			if (m_config.getKeyStore() != null) {
 				KeyStore keyStore;
 				try {
-					keyStore = KeyStore.getInstance(m_config.keyStore.type);
-					keyStore.load(new FileInputStream(m_config.keyStore.path),
-							m_config.keyStore.password.toCharArray());
-					sslcb.loadKeyMaterial(keyStore,
-							m_config.keyStore.password.toCharArray(), null);
+					keyStore = KeyStore.getInstance(m_config.getKeyStore()
+							.getType());
+					keyStore.load(new FileInputStream(m_config.getKeyStore()
+							.getPath()), m_config.getKeyStore().getPassword()
+							.toCharArray());
+					sslcb.loadKeyMaterial(keyStore, m_config.getKeyStore()
+							.getPassword().toCharArray(), null);
 				} catch (KeyStoreException | NoSuchAlgorithmException
 						| CertificateException | IOException
 						| UnrecoverableKeyException e) {
@@ -176,40 +179,39 @@ public class ApacheHttpClientKonnector extends SessionBasedClientKonnector {
 			connManager = new PoolingHttpClientConnectionManager();
 		}
 
-		connManager.setDefaultMaxPerRoute(m_config.numberOfSessions);
+		connManager.setDefaultMaxPerRoute(m_config.getNumberOfSessions());
 
 		HttpClientBuilder hcBuilder = HttpClients.custom();
 		hcBuilder.setConnectionManager(connManager);
 
 		CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
-		if (m_config.authentication != null) {
-
+		if (m_config.getAuthentication() != null) {
 			AuthCache authCache = new BasicAuthCache();
 			authCache.put(httpHost, new BasicScheme());
-
 			credentialsProvider.setCredentials(
 					new AuthScope(httpHost.getHostName(), httpHost.getPort(),
-							m_config.authentication.realm),
-					new UsernamePasswordCredentials(
-							m_config.authentication.username,
-							m_config.authentication.password));
+							m_config.getAuthentication().getRealm()),
+					new UsernamePasswordCredentials(m_config
+							.getAuthentication().getUsername(), m_config
+							.getAuthentication().getPassword()));
 		}
 
-		if (m_config.proxy != null) {
-			HttpHost proxy = new HttpHost(m_config.proxy.host,
-					m_config.proxy.port, m_config.proxy.scheme);
+		if (m_config.getProxy() != null) {
+			HttpHost proxy = new HttpHost(m_config.getProxy().getHost(),
+					m_config.getProxy().getPort(), m_config.getProxy()
+							.getScheme());
 			// hcBuilder.setProxy(proxy);
 			DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(
 					proxy);
 			hcBuilder.setRoutePlanner(routePlanner);
-			if (m_config.proxy.authentication != null) {
-				credentialsProvider.setCredentials(new AuthScope(
-						m_config.proxy.host, m_config.proxy.port,
-						m_config.proxy.authentication.realm),
-						new UsernamePasswordCredentials(
-								m_config.proxy.authentication.username,
-								m_config.proxy.authentication.password));
+			if (m_config.getProxy().getAuthentication() != null) {
+				credentialsProvider.setCredentials(new AuthScope(m_config
+						.getProxy().getHost(), m_config.getProxy().getPort(),
+						m_config.getProxy().getAuthentication().getRealm()),
+						new UsernamePasswordCredentials(m_config.getProxy()
+								.getAuthentication().getUsername(), m_config
+								.getProxy().getAuthentication().getPassword()));
 			}
 		}
 
