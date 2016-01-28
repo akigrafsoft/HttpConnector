@@ -77,6 +77,11 @@ public class ApacheNHttpServerKonnector extends Konnector {
 	}
 
 	@Override
+	public Class<? extends KonnectorConfiguration> getConfigurationClass() {
+		return HttpServerConfig.class;
+	}
+
+	@Override
 	public void doLoadConfig(KonnectorConfiguration config) {
 		// super.doLoadConfig(config);
 

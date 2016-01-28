@@ -74,6 +74,16 @@ public class ClientServer001Test {
 	}
 
 	@Test
+	public void testKonnectorImplementation() {
+		System.out.println("// -- testKonnectorImplementation");
+		assertEquals(HttpServerConfig.class,
+				m_serverKonnector.getConfigurationClass());
+
+		assertEquals(HttpClientConfig.class,
+				m_clientKonnector.getConfigurationClass());
+	}
+
+	@Test
 	public void test() {
 
 		try {

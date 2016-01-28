@@ -44,6 +44,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.BasicHttpContext;
 
 import com.akigrafsoft.knetthreads.ExceptionDuplicate;
+import com.akigrafsoft.knetthreads.konnector.ExceptionCreateSessionFailed;
 import com.akigrafsoft.knetthreads.konnector.KonnectorConfiguration;
 import com.akigrafsoft.knetthreads.konnector.KonnectorDataobject;
 import com.akigrafsoft.knetthreads.konnector.SessionBasedClientKonnector;
@@ -58,6 +59,11 @@ public class ApacheHttpClientKonnector extends SessionBasedClientKonnector {
 
 	public ApacheHttpClientKonnector(String name) throws ExceptionDuplicate {
 		super(name);
+	}
+
+	@Override
+	public Class<? extends KonnectorConfiguration> getConfigurationClass() {
+		return HttpClientConfig.class;
 	}
 
 	@Override
