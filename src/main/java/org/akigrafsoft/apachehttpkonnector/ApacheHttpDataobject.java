@@ -32,7 +32,7 @@ public class ApacheHttpDataobject extends KonnectorDataobject {
 	 * GET :
 	 * 
 	 * <pre>
-	 * do.httpRequest = new HttpGet("/?msisdn='0689..'{&literal &}transactionId='foo'")
+	 * do.httpRequest = new HttpGet("/?msisdn='068966'");
 	 * </pre>
 	 * 
 	 * POST :
@@ -67,6 +67,7 @@ public class ApacheHttpDataobject extends KonnectorDataobject {
 	 * Constructor
 	 * 
 	 * @param message
+	 *            message to be associated to this dataobject
 	 */
 	public ApacheHttpDataobject(final Message message) {
 		super(message);
@@ -77,7 +78,9 @@ public class ApacheHttpDataobject extends KonnectorDataobject {
 	 * Internal use, this sets <code>isCreatedByServer = true</code>
 	 * 
 	 * @param message
+	 *            message to be associated to this dataobject
 	 * @param konnectorName
+	 *            name of Konnector that created this dataobject
 	 */
 	ApacheHttpDataobject(final Message message, String konnectorName) {
 		super(message);
@@ -96,10 +99,8 @@ public class ApacheHttpDataobject extends KonnectorDataobject {
 
 	public String getHttpRequestBody() {
 		String o_body = null;
-		if ((httpRequest != null)
-				&& (httpRequest instanceof HttpEntityEnclosingRequest)) {
-			HttpEntity entity = ((HttpEntityEnclosingRequest) httpRequest)
-					.getEntity();
+		if ((httpRequest != null) && (httpRequest instanceof HttpEntityEnclosingRequest)) {
+			HttpEntity entity = ((HttpEntityEnclosingRequest) httpRequest).getEntity();
 			try {
 				o_body = EntityUtils.toString(entity);
 			} catch (IOException e) {

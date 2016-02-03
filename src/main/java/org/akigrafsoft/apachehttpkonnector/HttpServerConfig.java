@@ -72,34 +72,17 @@ public class HttpServerConfig extends KonnectorConfiguration {
 
 	// ------------------------------------------------------------------------
 	// Fluent API
-	/**
-	 * Set URL to listen on
-	 * 
-	 * @param value
-	 * @return
-	 */
+
 	public HttpServerConfig url(String value) {
 		this.url = value;
 		return this;
 	}
 
-	/**
-	 * 
-	 * @param authentication
-	 * @return
-	 */
 	public HttpServerConfig authentication(AuthenticationConfig authentication) {
 		this.authentication = authentication;
 		return this;
 	}
 
-	/**
-	 * 
-	 * @param type
-	 * @param path
-	 * @param password
-	 * @return
-	 */
 	public HttpServerConfig keyStore(String type, String path, String password) {
 		// this.keyStore = new KeyStoreConfig(type, path, password);
 		this.keyStore = new KeyStoreConfig();
@@ -109,13 +92,6 @@ public class HttpServerConfig extends KonnectorConfiguration {
 		return this;
 	}
 
-	/**
-	 * 
-	 * @param type
-	 * @param path
-	 * @param password
-	 * @return
-	 */
 	public HttpServerConfig trustStore(String type, String path, String password) {
 		// this.trustStore = new KeyStoreConfig(type, path, password);
 
@@ -134,54 +110,39 @@ public class HttpServerConfig extends KonnectorConfiguration {
 		try {
 			new URL(this.url);
 		} catch (MalformedURLException e) {
-			throw new ExceptionAuditFailed("MalformedURLException:"
-					+ e.getMessage());
+			throw new ExceptionAuditFailed("MalformedURLException:" + e.getMessage());
 		}
 
 		if (authentication != null) {
-			if ((authentication.getUsername() == null)
-					|| authentication.getUsername().isEmpty()) {
-				throw new ExceptionAuditFailed(
-						"authentication.username must be provided and non empty");
+			if ((authentication.getUsername() == null) || authentication.getUsername().isEmpty()) {
+				throw new ExceptionAuditFailed("authentication.username must be provided and non empty");
 			}
-			if ((authentication.getPassword() == null)
-					|| authentication.getPassword().isEmpty()) {
-				throw new ExceptionAuditFailed(
-						"authentication.password must be provided and non empty");
+			if ((authentication.getPassword() == null) || authentication.getPassword().isEmpty()) {
+				throw new ExceptionAuditFailed("authentication.password must be provided and non empty");
 			}
 		}
 
 		if (keyStore != null) {
 			if ((keyStore.getType() == null) || keyStore.getType().isEmpty()) {
-				throw new ExceptionAuditFailed(
-						"keyStore.type must be provided and non empty");
+				throw new ExceptionAuditFailed("keyStore.type must be provided and non empty");
 			}
 			if ((keyStore.getPath() == null) || keyStore.getPath().isEmpty()) {
-				throw new ExceptionAuditFailed(
-						"keyStore.path must be provided and non empty");
+				throw new ExceptionAuditFailed("keyStore.path must be provided and non empty");
 			}
-			if ((keyStore.getPassword() == null)
-					|| keyStore.getPassword().isEmpty()) {
-				throw new ExceptionAuditFailed(
-						"keyStore.password must be provided and non empty");
+			if ((keyStore.getPassword() == null) || keyStore.getPassword().isEmpty()) {
+				throw new ExceptionAuditFailed("keyStore.password must be provided and non empty");
 			}
 		}
 
 		if (trustStore != null) {
-			if ((trustStore.getType() == null)
-					|| trustStore.getType().isEmpty()) {
-				throw new ExceptionAuditFailed(
-						"trustStore.type must be provided and non empty");
+			if ((trustStore.getType() == null) || trustStore.getType().isEmpty()) {
+				throw new ExceptionAuditFailed("trustStore.type must be provided and non empty");
 			}
-			if ((trustStore.getPath() == null)
-					|| trustStore.getPath().isEmpty()) {
-				throw new ExceptionAuditFailed(
-						"trustStore.path must be provided and non empty");
+			if ((trustStore.getPath() == null) || trustStore.getPath().isEmpty()) {
+				throw new ExceptionAuditFailed("trustStore.path must be provided and non empty");
 			}
-			if ((trustStore.getPassword() == null)
-					|| trustStore.getPassword().isEmpty()) {
-				throw new ExceptionAuditFailed(
-						"trustStore.password must be provided and non empty");
+			if ((trustStore.getPassword() == null) || trustStore.getPassword().isEmpty()) {
+				throw new ExceptionAuditFailed("trustStore.password must be provided and non empty");
 			}
 		}
 
