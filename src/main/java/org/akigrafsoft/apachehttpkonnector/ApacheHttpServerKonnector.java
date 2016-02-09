@@ -96,10 +96,8 @@ public class ApacheHttpServerKonnector extends Konnector {
 	@Override
 	protected CommandResult doStart() {
 		// Set up the HTTP protocol processor
-		HttpProcessor httpproc = HttpProcessorBuilder.create()
-				.add(new ResponseDate())
-				.add(new ResponseServer("HTTPKonnector/1.1"))
-				.add(new ResponseContent()).add(new ResponseConnControl())
+		HttpProcessor httpproc = HttpProcessorBuilder.create().add(new ResponseDate())
+				.add(new ResponseServer("HTTPKonnector/1.1")).add(new ResponseContent()).add(new ResponseConnControl())
 				.build();
 
 		// Set up request handlers
@@ -120,17 +118,12 @@ public class ApacheHttpServerKonnector extends Konnector {
 			if (m_config.keyStore != null) {
 				KeyManagerFactory kmfactory;
 				try {
-					KeyStore keyStore = KeyStore.getInstance(m_config.keyStore
-							.getType());
-					keyStore.load(
-							new FileInputStream(m_config.keyStore.getPath()),
+					KeyStore keyStore = KeyStore.getInstance(m_config.keyStore.getType());
+					keyStore.load(new FileInputStream(m_config.keyStore.getPath()),
 							m_config.keyStore.getPassword().toCharArray());
-					kmfactory = KeyManagerFactory.getInstance(KeyManagerFactory
-							.getDefaultAlgorithm());
-					kmfactory.init(keyStore, m_config.keyStore.getPassword()
-							.toCharArray());
-				} catch (KeyStoreException | NoSuchAlgorithmException
-						| CertificateException | IOException
+					kmfactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+					kmfactory.init(keyStore, m_config.keyStore.getPassword().toCharArray());
+				} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException
 						| UnrecoverableKeyException e) {
 					e.printStackTrace();
 					return CommandResult.Fail;
@@ -182,8 +175,7 @@ public class ApacheHttpServerKonnector extends Konnector {
 
 		try {
 			m_latch = new Object();
-			m_listenerThread = new RequestListenerThread(m_url.getPort(),
-					httpService, m_serversocket, m_latch);
+			m_listenerThread = new RequestListenerThread(m_url.getPort(), httpService, m_serversocket, m_latch);
 			m_listenerThread.setDaemon(false);
 			m_listenerThread.start();
 		} catch (IOException e) {
@@ -191,7 +183,8 @@ public class ApacheHttpServerKonnector extends Konnector {
 			return CommandResult.Fail;
 		}
 
-		setStarted();
+		this.setStarted();
+		this.setAvailable();
 
 		return CommandResult.Success;
 	}
@@ -208,8 +201,7 @@ public class ApacheHttpServerKonnector extends Konnector {
 		private final HttpService httpService;
 		private final Object m_latch;
 
-		public RequestListenerThread(final int port,
-				final HttpService httpService, final ServerSocket serversocket,
+		public RequestListenerThread(final int port, final HttpService httpService, final ServerSocket serversocket,
 				final Object latch) throws IOException {
 			// this.m_this = konnector;
 			this.connFactory = DefaultBHttpServerConnectionFactory.INSTANCE;
@@ -222,8 +214,7 @@ public class ApacheHttpServerKonnector extends Konnector {
 		public void run() {
 			if (AdminLogger.isInfoEnabled())
 				AdminLogger.info(ApacheHttpServerKonnector.this
-						.buildAdminLog("Listening on port<"
-								+ this.serversocket.getLocalPort() + ">"));
+						.buildAdminLog("Listening on port<" + this.serversocket.getLocalPort() + ">"));
 			while (!Thread.interrupted()) {
 				try {
 					// Set up HTTP connection
@@ -231,31 +222,25 @@ public class ApacheHttpServerKonnector extends Konnector {
 
 					if (AdminLogger.isDebugEnabled())
 						AdminLogger.debug(ApacheHttpServerKonnector.this
-								.buildAdminLog("Incoming connection from<"
-										+ socket.getInetAddress() + ">"));
+								.buildAdminLog("Incoming connection from<" + socket.getInetAddress() + ">"));
 
-					HttpServerConnection conn = this.connFactory
-							.createConnection(socket);
+					HttpServerConnection conn = this.connFactory.createConnection(socket);
 					// Use a network thread to service the connection
-					executeInNetworkThread(new WorkerThread(this.httpService,
-							conn));
+					executeInNetworkThread(new WorkerThread(this.httpService, conn));
 				} catch (SocketTimeoutException se) {
 					continue;
 				} catch (InterruptedIOException ex) {
 					break;
 				} catch (IOException e) {
-					AdminLogger
-							.error(ApacheHttpServerKonnector.this
-									.buildAdminLog("I/O error initialising connection thread: "
-											+ e.getMessage()));
+					AdminLogger.error(ApacheHttpServerKonnector.this
+							.buildAdminLog("I/O error initialising connection thread: " + e.getMessage()));
 					break;
 				}
 			}
 
 			if (AdminLogger.isInfoEnabled())
 				AdminLogger.info(ApacheHttpServerKonnector.this
-						.buildAdminLog("Stop listening on port<"
-								+ this.serversocket.getLocalPort() + ">"));
+						.buildAdminLog("Stop listening on port<" + this.serversocket.getLocalPort() + ">"));
 
 			try {
 				serversocket.close();
@@ -274,8 +259,7 @@ public class ApacheHttpServerKonnector extends Konnector {
 		private final HttpService httpservice;
 		private final HttpServerConnection conn;
 
-		public WorkerThread(final HttpService httpservice,
-				final HttpServerConnection conn) {
+		public WorkerThread(final HttpService httpservice, final HttpServerConnection conn) {
 			super();
 			this.httpservice = httpservice;
 			this.conn = conn;
@@ -289,15 +273,12 @@ public class ApacheHttpServerKonnector extends Konnector {
 					this.httpservice.handleRequest(this.conn, context);
 				}
 			} catch (ConnectionClosedException e) {
-				AdminLogger.error(ApacheHttpServerKonnector.this
-						.buildAdminLog("ConnectionClosedException:"
-								+ e.getMessage()));
+				AdminLogger.error(
+						ApacheHttpServerKonnector.this.buildAdminLog("ConnectionClosedException:" + e.getMessage()));
 			} catch (IOException e) {
-				AdminLogger.error(ApacheHttpServerKonnector.this
-						.buildAdminLog("IOException:" + e.getMessage()));
+				AdminLogger.error(ApacheHttpServerKonnector.this.buildAdminLog("IOException:" + e.getMessage()));
 			} catch (HttpException e) {
-				AdminLogger.error(ApacheHttpServerKonnector.this
-						.buildAdminLog("HttpException:" + e.getMessage()));
+				AdminLogger.error(ApacheHttpServerKonnector.this.buildAdminLog("HttpException:" + e.getMessage()));
 			} finally {
 				try {
 					this.conn.shutdown();
@@ -311,8 +292,8 @@ public class ApacheHttpServerKonnector extends Konnector {
 	public class HttpHandler implements HttpRequestHandler {
 
 		@Override
-		public void handle(HttpRequest httpRequest, HttpResponse response,
-				HttpContext context) throws HttpException, IOException {
+		public void handle(HttpRequest httpRequest, HttpResponse response, HttpContext context)
+				throws HttpException, IOException {
 
 			try {
 				if (m_config.authentication != null) {
@@ -341,8 +322,7 @@ public class ApacheHttpServerKonnector extends Konnector {
 				// reused
 				//
 				if (httpRequest instanceof HttpEntityEnclosingRequest) {
-					HttpEntity entity = ((HttpEntityEnclosingRequest) httpRequest)
-							.getEntity();
+					HttpEntity entity = ((HttpEntityEnclosingRequest) httpRequest).getEntity();
 					if (entity != null) {
 						try {
 							EntityUtils.consume(entity);
@@ -355,8 +335,7 @@ public class ApacheHttpServerKonnector extends Konnector {
 
 		}
 
-		private boolean performAuthentication(HttpRequest request,
-				HttpResponse response, HttpContext context) {
+		private boolean performAuthentication(HttpRequest request, HttpResponse response, HttpContext context) {
 			Header h_auth = request.getFirstHeader(AUTH.WWW_AUTH_RESP);
 
 			// If the request doesn't contain an "Authorization"
@@ -367,8 +346,7 @@ public class ApacheHttpServerKonnector extends Konnector {
 			//
 			if (h_auth == null) {
 				response.setStatusCode(HttpStatus.SC_UNAUTHORIZED);
-				response.addHeader(AUTH.WWW_AUTH, "Basic realm=\""
-						+ m_config.authentication.getRealm() + "\"");
+				response.addHeader(AUTH.WWW_AUTH, "Basic realm=\"" + m_config.authentication.getRealm() + "\"");
 				return false;
 			}
 
@@ -398,15 +376,13 @@ public class ApacheHttpServerKonnector extends Konnector {
 				return false;
 			}
 
-			if (m_config.authentication.getRealm() != null
-					&& !m_config.authentication.getRealm().isEmpty()) {
+			if (m_config.authentication.getRealm() != null && !m_config.authentication.getRealm().isEmpty()) {
 
 				String realm[] = h_realm.toString().split(" ");
 				if (!m_config.authentication.getRealm().equals(realm[1])) {
 					response.setStatusCode(HttpStatus.SC_FORBIDDEN);
 					try {
-						response.setEntity(new StringEntity(
-								"Authentication Failed"));
+						response.setEntity(new StringEntity("Authentication Failed"));
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();
 					}
@@ -416,16 +392,13 @@ public class ApacheHttpServerKonnector extends Konnector {
 			return true;
 		}
 
-		protected void handleRequest(HttpRequest httpRequest,
-				HttpResponse httpResponse, HttpContext context) {
+		protected void handleRequest(HttpRequest httpRequest, HttpResponse httpResponse, HttpContext context) {
 
 			Message message = new Message();
-			ApacheHttpDataobject l_dataobject = new ApacheHttpDataobject(
-					message, getName());
+			ApacheHttpDataobject l_dataobject = new ApacheHttpDataobject(message, getName());
 
 			if (ActivityLogger.isDebugEnabled())
-				ActivityLogger.debug(buildActivityLog(null, "handleRequest<"
-						+ httpRequest + ">"));
+				ActivityLogger.debug(buildActivityLog(null, "handleRequest<" + httpRequest + ">"));
 
 			l_dataobject.httpRequest = httpRequest;
 			l_dataobject.httpResponse = httpResponse;
@@ -445,11 +418,9 @@ public class ApacheHttpServerKonnector extends Konnector {
 
 			if (ActivityLogger.isDebugEnabled())
 				if (responded) {
-					ActivityLogger.debug(buildActivityLog(message,
-							"responded <" + l_dataobject.httpResponse + ">"));
+					ActivityLogger.debug(buildActivityLog(message, "responded <" + l_dataobject.httpResponse + ">"));
 				} else {
-					ActivityLogger.debug(buildActivityLog(message,
-							"no response>"));
+					ActivityLogger.debug(buildActivityLog(message, "no response>"));
 				}
 		}
 	}
@@ -479,6 +450,8 @@ public class ApacheHttpServerKonnector extends Konnector {
 			e.printStackTrace();
 			return CommandResult.Fail;
 		}
+
+		this.setUnavailable();
 
 		this.setStopped();
 
