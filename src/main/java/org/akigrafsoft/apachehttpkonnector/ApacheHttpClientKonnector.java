@@ -252,9 +252,8 @@ public class ApacheHttpClientKonnector extends SessionBasedClientKonnector {
 	}
 
 	@Override
-	protected void onAllSessionStopped() {
+	protected void onAllSessionsStopped() {
 		HttpClientUtils.closeQuietly(httpClient);
-		super.onAllSessionStopped();
 	};
 
 }
