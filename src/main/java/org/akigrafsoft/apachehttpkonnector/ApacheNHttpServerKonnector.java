@@ -1,3 +1,9 @@
+/**
+ * Open-source, by AkiGrafSoft.
+ *
+ * $Id:  $
+ *
+ **/
 package org.akigrafsoft.apachehttpkonnector;
 
 import java.io.FileInputStream;
