@@ -66,7 +66,7 @@ public class Server001Test {
 
 		try {
 			m_serverKonnector.configure(new HttpServerConfig()
-			// .url("http://localhost:" + port));
+					// .url("http://localhost:" + port));
 					.url("http://10.100.115.25:" + port));
 		} catch (ExceptionAuditFailed e) {
 			e.printStackTrace();
@@ -79,19 +79,16 @@ public class Server001Test {
 		try {
 			Endpoint nap = new Endpoint("test") {
 				@Override
-				public KonnectorRouter getKonnectorRouter(Message message,
-						KonnectorDataobject dataobject) {
+				public KonnectorRouter getKonnectorRouter(Message message, KonnectorDataobject dataobject) {
 					return new KonnectorRouter() {
-						public Konnector resolveKonnector(Message message,
-								KonnectorDataobject dataobject) {
+						public Konnector resolveKonnector(Message message, KonnectorDataobject dataobject) {
 							return m_serverKonnector;
 						}
 					};
 				}
 
 				@Override
-				public RequestEnum classifyInboundMessage(Message message,
-						KonnectorDataobject dataobject) {
+				public RequestEnum classifyInboundMessage(Message message, KonnectorDataobject dataobject) {
 					received = new Received(message, dataobject);
 
 					// Fake flow by submitting a response directly
@@ -109,8 +106,7 @@ public class Server001Test {
 							+ "<testSFR>aaaaaaaaaaaaaaaaaaaaaaaaaaaaazzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyynnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn</testSFR>"
 							+ "</SubParty></SOAP-ENV:Body></SOAP-ENV:Envelope>";
 
-					StringEntity body = new StringEntity(xml,
-							ContentType.create("text/xml", "UTF-8"));
+					StringEntity body = new StringEntity(xml, ContentType.create("text/xml", "UTF-8"));
 					l_dataobject.httpResponse.setEntity(body);
 					System.out.println(l_dataobject.httpResponse);
 
@@ -127,10 +123,10 @@ public class Server001Test {
 					return null;
 				}
 			};
-			nap.setDispatcher(new Dispatcher() {
+			nap.setDispatcher(new Dispatcher<RequestEnum>("foo") {
 				@Override
-				public FlowProcessContext getContext(Message message,
-						KonnectorDataobject dataobject, RequestEnum request) {
+				public FlowProcessContext getContext(Message message, KonnectorDataobject dataobject,
+						RequestEnum request) {
 					return null;
 				}
 			});

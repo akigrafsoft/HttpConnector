@@ -137,7 +137,7 @@ public class ClientServer001Test {
 					return null;
 				}
 			};
-			nap.setDispatcher(new Dispatcher() {
+			nap.setDispatcher(new Dispatcher<RequestEnum>("foo") {
 				@Override
 				public FlowProcessContext getContext(Message message,
 						KonnectorDataobject dataobject, RequestEnum request) {
