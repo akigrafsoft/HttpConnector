@@ -24,6 +24,7 @@ import com.akigrafsoft.knetthreads.Message;
 import com.akigrafsoft.knetthreads.RequestEnum;
 import com.akigrafsoft.knetthreads.konnector.Konnector;
 import com.akigrafsoft.knetthreads.konnector.KonnectorDataobject;
+import com.akigrafsoft.knetthreads.routing.EndpointRouter;
 import com.akigrafsoft.knetthreads.routing.KonnectorRouter;
 
 public class ClientServer001Test {
@@ -77,40 +78,34 @@ public class ClientServer001Test {
 	@Test
 	public void testKonnectorImplementation() {
 		System.out.println("// -- testKonnectorImplementation");
-		assertEquals(HttpServerConfig.class,
-				m_serverKonnector.getConfigurationClass());
+		assertEquals(HttpServerConfig.class, m_serverKonnector.getConfigurationClass());
 
-		assertEquals(HttpClientConfig.class,
-				m_clientKonnector.getConfigurationClass());
+		assertEquals(HttpClientConfig.class, m_clientKonnector.getConfigurationClass());
 	}
 
 	@Test
 	public void test() {
 
 		try {
-			m_serverKonnector.configure(new HttpServerConfig()
-					.url("http://localhost:" + port));
+			m_serverKonnector.configure(new HttpServerConfig().url("http://localhost:" + port));
 		} catch (ExceptionAuditFailed e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 			return;
 		}
 		try {
-			Endpoint nap = new Endpoint("test") {
+			final Endpoint ep = new Endpoint("test") {
 				@Override
-				public KonnectorRouter getKonnectorRouter(Message message,
-						KonnectorDataobject dataobject) {
+				public KonnectorRouter getKonnectorRouter(Message message, KonnectorDataobject dataobject) {
 					return new KonnectorRouter() {
-						public Konnector resolveKonnector(Message message,
-								KonnectorDataobject dataobject) {
+						public Konnector resolveKonnector(Message message, KonnectorDataobject dataobject) {
 							return m_serverKonnector;
 						}
 					};
 				}
 
 				@Override
-				public RequestEnum classifyInboundMessage(Message message,
-						KonnectorDataobject dataobject) {
+				public RequestEnum classifyInboundMessage(Message message, KonnectorDataobject dataobject) {
 					received = new Received(message, dataobject);
 
 					// Fake flow by submitting a response directly
@@ -119,10 +114,8 @@ public class ClientServer001Test {
 					ApacheHttpDataobject l_dataobject = (ApacheHttpDataobject) dataobject;
 
 					String xml = "<ok/>";
-					System.out.println(this.getClass().getName() + "|encoded: "
-							+ xml);
-					StringEntity body = new StringEntity(xml,
-							ContentType.create("text/xml", "UTF-8"));
+					System.out.println(this.getClass().getName() + "|encoded: " + xml);
+					StringEntity body = new StringEntity(xml, ContentType.create("text/xml", "UTF-8"));
 					l_dataobject.httpResponse.setEntity(body);
 					System.out.println(l_dataobject.httpResponse);
 
@@ -138,14 +131,20 @@ public class ClientServer001Test {
 					return null;
 				}
 			};
-			nap.setDispatcher(new Dispatcher<RequestEnum>("foo") {
+			ep.setDispatcher(new Dispatcher<RequestEnum>("foo") {
 				@Override
-				public FlowProcessContext getContext(Message message,
-						KonnectorDataobject dataobject, RequestEnum request) {
+				public FlowProcessContext getContext(Message message, KonnectorDataobject dataobject,
+						RequestEnum request) {
 					return null;
 				}
 			});
-			m_serverKonnector.setEndpoint(nap);
+			m_serverKonnector.setEndpointRouter(new EndpointRouter() {
+				@Override
+				public Endpoint resolveKonnector(Message message, KonnectorDataobject dataobject) {
+					return ep;
+				}
+			});
+
 		} catch (ExceptionDuplicate e) {
 			e.printStackTrace();
 			fail(e.getMessage());
@@ -153,8 +152,7 @@ public class ClientServer001Test {
 		}
 
 		try {
-			m_clientKonnector.configure(new HttpClientConfig()
-					.url("http://localhost:" + port));
+			m_clientKonnector.configure(new HttpClientConfig().url("http://localhost:" + port));
 		} catch (ExceptionAuditFailed e) {
 			e.printStackTrace();
 			fail(e.getMessage());
@@ -172,8 +170,7 @@ public class ClientServer001Test {
 		{
 			ApacheHttpDataobject dataobject = new ApacheHttpDataobject(message);
 			dataobject.operationMode = KonnectorDataobject.OperationMode.TWOWAY;
-			dataobject.httpRequest = new HttpGet(
-					"/?msisdn='0689'&transactionId='t001'");
+			dataobject.httpRequest = new HttpGet("/?msisdn='0689'&transactionId='t001'");
 			message.associateDataobject("test", dataobject);
 
 			dataobject.operationSyncMode = KonnectorDataobject.SyncMode.ASYNC;
@@ -185,8 +182,7 @@ public class ClientServer001Test {
 			}
 			String o_body;
 			try {
-				o_body = EntityUtils.toString(dataobject.httpResponse
-						.getEntity());
+				o_body = EntityUtils.toString(dataobject.httpResponse.getEntity());
 			} catch (ParseException | IOException e) {
 				e.printStackTrace();
 				fail(e.getMessage());
