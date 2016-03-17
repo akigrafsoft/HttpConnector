@@ -1,3 +1,9 @@
+/**
+ * Open-source, by AkiGrafSoft.
+ *
+ * $Id:  $
+ *
+ **/
 package org.akigrafsoft.apachehttpkonnector.endpoint;
 
 import org.akigrafsoft.apachehttpkonnector.ApacheHttpDataobject;
